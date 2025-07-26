@@ -19,6 +19,64 @@ struct Node
   }
 };
 
+void FloydWarshall(vector<vector<ll>> &dist, int N)
+{
+  for (int i = 1; i <= N; i++)
+    dist[i][i] = 0;
+  for (int k = 1; k <= N; k++)
+    for (int i = 1; i <= N; i++)
+      for (int j = 1; j <= N; j++)
+      {
+        if (dist[k][j] != LLONG_MAX && dist[i][k] != LLONG_MAX)
+          dist[i][j] = min(dist[i][j], dist[i][k] + dist[k][j]);
+      }
+}
+struct EdgeBellman
+{
+  int u;
+  int v;
+  ll w;
+};
+set<int> BellmanFordOpposite(vector<ll> &dist, vector<EdgeBellman> &edges, int n)
+{
+  dist[1] = 0;
+  while (--n)
+  {
+    for (const auto [u, v, w] : edges)
+    {
+      if (dist[u] != LLONG_MIN && dist[u] + w > dist[v])
+        dist[v] = dist[u] + w;
+    }
+  }
+  set<int> cycle_nodes;
+  for (const auto [u, v, w] : edges)
+  {
+    if (dist[u] != LLONG_MIN && dist[u] + w > dist[v])
+      cycle_nodes.insert(v);
+  }
+  return cycle_nodes;
+}
+vector<int> BellmanFordAllSourceCycleDetect(vector<ll> &dist, vector<EdgeBellman> &edges, int n, int &CycleDetect)
+{
+  dist[0] = 0;
+  vector<int> parent(n + 1, -1);
+  // int CycleDetect = -1;
+  while (n--)
+  {
+    CycleDetect = -1;
+    for (const auto [u, v, w] : edges)
+    {
+      if (dist[u] != LLONG_MAX && dist[u] + w < dist[v])
+      {
+        CycleDetect = v;
+        dist[v] = dist[u] + w;
+        parent[v] = u;
+      }
+    }
+  }
+  return parent;
+}
+
 vector<ll> dijkstra(int N, vector<Edge> G[], int start)
 {
   vector<ll> dist(N + 1, LLONG_MAX);
