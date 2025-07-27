@@ -176,6 +176,24 @@ void dfs(int v, vector<int> adj[], vector<bool> &visited)
     dfs(neighbor, adj, visited);
 }
 
+vector<vector<int>> binaryLifting(int n, vector<int> &p)
+{
+  const int LOG = 30; // log(10^9)
+  vector<vector<int>> ancestor(n + 1, vector<int>(LOG, 0));
+  for (int u = 1; u <= n; u++)
+  {
+    ancestor[u][0] = p[u];
+  }
+  for (int i = 1; i < LOG; i++)
+  {
+    for (int u = 1; u <= n; u++)
+    {
+      ancestor[u][i] = ancestor[ancestor[u][i - 1]][i - 1];
+    }
+  }
+  return ancestor;
+}
+
 void solve()
 {
 }
