@@ -77,6 +77,30 @@ vector<int> BellmanFordAllSourceCycleDetect(vector<ll> &dist, vector<EdgeBellman
   return parent;
 }
 
+void kahns_Algo(vector<int> adj[], vector<pair<int, int>> &edges, int n, vector<int> &path)
+{
+  queue<int> q;
+  vector<int> inDegree(n + 1, 0);
+  for (const auto [a, b] : edges)
+    inDegree[b]++;
+  for (int i = 1; i <= n; i++)
+    if (!inDegree[i])
+      q.push(i);
+  int u;
+  while (!q.empty())
+  {
+    u = q.front();
+    path.push_back(u);
+    q.pop();
+    for (const int &v : adj[u])
+    {
+      inDegree[v]--;
+      if (!inDegree[v])
+        q.push(v);
+    }
+  }
+}
+
 vector<ll> dijkstra(int N, vector<Edge> G[], int start)
 {
   vector<ll> dist(N + 1, LLONG_MAX);
