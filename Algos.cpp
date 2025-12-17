@@ -176,26 +176,100 @@ void dfs(int v, vector<int> adj[], vector<bool> &visited)
     dfs(neighbor, adj, visited);
 }
 
+// binary lifting for kth ancestor
 vector<vector<int>> binaryLifting(int n, vector<int> &p)
 {
-  const int LOG = 30; // log(10^9)
-  vector<vector<int>> ancestor(n + 1, vector<int>(LOG, 0));
+  int LOG = log2(n) + 1;
+  vector<vector<int>> ancestor(n + 1, vector<int>(LOG, -1));
   for (int u = 1; u <= n; u++)
-  {
     ancestor[u][0] = p[u];
-  }
   for (int i = 1; i < LOG; i++)
-  {
     for (int u = 1; u <= n; u++)
-    {
-      ancestor[u][i] = ancestor[ancestor[u][i - 1]][i - 1];
-    }
-  }
+      if (ancestor[u][i - 1] != -1)
+        ancestor[u][i] = ancestor[ancestor[u][i - 1]][i - 1];
   return ancestor;
 }
 
+int findKthAncestor(vector<vector<int>> &ancestor, int node, int K, int maxN)
+{
+  for (int i = maxN - 1; i >= 0; i--)
+    if (K & (1 << i))
+    {
+      if (ancestor[node][i] == -1)
+        return -1;
+      node = ancestor[node][i];
+    }
+  return node;
+}
+
+// least common ancestor using binary lifting
+void dfs(int u, int p, vector<vector<int>> &memo, vector<int> &lev, int log, vector<vector<int>> &g)
+{
+  memo[u][0] = p;
+  for (int i = 1; i <= log; i++)
+    memo[u][i] = memo[memo[u][i - 1]][i - 1];
+  for (int v : g[u])
+  {
+    if (v != p)
+    {
+      lev[v] = lev[u] + 1;
+      dfs(v, u, memo, lev, log, g);
+    }
+  }
+}
+int LCA(int a, int b, vector<int> &level, vector<vector<int>> &up, int N)
+{
+  if (level[b] < level[a])
+    swap(a, b);
+  int d = level[b] - level[a];
+
+  while (d)
+  {
+    int i = log2(d);
+    b = up[b][i];
+    d -= (1 << i);
+  }
+
+  if (a == b)
+    return a;
+
+  for (int i = N - 1; i >= 0; i--)
+  {
+    if (up[a][i] != -1 && up[a][i] != up[b][i])
+    {
+      a = up[a][i];
+      b = up[b][i];
+    }
+  }
+
+  return up[a][0];
+}
 void solve()
 {
+  vector<int> parent = BellmanFordAllSourceCycleDetect(dist, edges, n, CycleDetect);
+  if (CycleDetect == -1)
+  {
+    cout << "NO\n";
+    return;
+  }
+  cout << "YES\n";
+  for (int i = 0; i < n - 1; i++)
+    if (parent[CycleDetect] != -1 && parent[CycleDetect] != 0)
+      CycleDetect = parent[CycleDetect];
+  vector<int> cycle;
+  int curr = CycleDetect;
+  // int prev;
+
+  while (curr != -1 && curr != 0)
+  {
+    cycle.push_back(curr);
+    if (curr == CycleDetect && cycle.size() > 1)
+      break;
+    // prev = curr;
+    curr = parent[curr];
+  }
+
+  reverse(cycle.begin(), cycle.end());
 }
 
 int main()
