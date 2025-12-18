@@ -29,8 +29,7 @@ ll spanningTree(int V, vector<vector<Edge>> &adj)
 
     ll wt = p.weight;
     int u = p.v;
-    // cout << "in node " << u << '\n';
-    // cout << "wt " << wt << '\n';
+
     if (visited[u] == true)
       continue;
 
