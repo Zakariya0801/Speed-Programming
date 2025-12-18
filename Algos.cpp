@@ -18,7 +18,39 @@ struct Node
     return a.dist > b.dist;
   }
 };
+// Prim's Algorithm
+ll spanningTree(int V, vector<vector<Edge>> &adj)
+{
+  priority_queue<Node> pq;
 
+  vector<bool> visited(V, false);
+  ll res = 0;
+
+  pq.push({1, 0});
+
+  while (!pq.empty())
+  {
+    auto p = pq.top();
+    pq.pop();
+
+    ll wt = p.dist;
+    int u = p.id;
+    if (visited[u] == true)
+      continue;
+
+    res += wt;
+    visited[u] = true;
+    for (auto v : adj[u])
+    {
+      if (visited[v.v] == false)
+        pq.push({v.v, v.w});
+    }
+  }
+  for (int i = 1; i < V; i++)
+    if (!visited[i])
+      return -1;
+  return res;
+}
 void FloydWarshall(vector<vector<ll>> &dist, int N)
 {
   for (int i = 1; i <= N; i++)
@@ -100,7 +132,44 @@ void kahns_Algo(vector<int> adj[], vector<pair<int, int>> &edges, int n, vector<
     }
   }
 }
+// Disjoint Set Union DSU for Dynamic Graphs
+vector<int> parent;
+vector<int> len;
+vector<int> depth;
+int comp;
+int maxComp = 0;
+int find(int x)
+{
+  if (parent[x] != x)
+    parent[x] = find(parent[x]);
+  return parent[x];
+}
 
+void merge(int x, int y)
+{
+  int lx = find(x);
+  int ly = find(y);
+  if (lx == ly)
+    return;
+  if (depth[lx] > depth[ly])
+  {
+    parent[ly] = lx;
+    len[lx] += len[ly];
+  }
+  else if (depth[lx] < depth[ly])
+  {
+    parent[lx] = ly;
+    len[ly] += len[lx];
+  }
+  else
+  {
+    parent[lx] = ly;
+    depth[ly]++;
+    len[ly] += len[lx];
+  }
+  maxComp = max(maxComp, max(len[lx], len[ly]));
+  comp--;
+}
 vector<ll> dijkstra(int N, vector<Edge> G[], int start)
 {
   vector<ll> dist(N + 1, LLONG_MAX);
