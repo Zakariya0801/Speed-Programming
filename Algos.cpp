@@ -109,10 +109,11 @@ vector<int> BellmanFordAllSourceCycleDetect(vector<ll> &dist, vector<EdgeBellman
   return parent;
 }
 
-void kahns_Algo(vector<int> adj[], vector<pair<int, int>> &edges, int n, vector<int> &path)
+vector<int> kahns_Algo(vector<int> adj[], vector<pair<int, int>> &edges, int n)
 {
   queue<int> q;
   vector<int> inDegree(n + 1, 0);
+  vector<int> path;
   for (const auto [a, b] : edges)
     inDegree[b]++;
   for (int i = 1; i <= n; i++)
@@ -131,6 +132,7 @@ void kahns_Algo(vector<int> adj[], vector<pair<int, int>> &edges, int n, vector<
         q.push(v);
     }
   }
+  return path;
 }
 // Disjoint Set Union DSU for Dynamic Graphs
 vector<int> parent;
